@@ -1,25 +1,37 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { gql, useQuery} from '@apollo/client';
+
+interface Country {
+  name: string,
+  code: string
+  emoji: string
+}
+
+const LIST_COUNTRIES = gql`
+  {
+    countries {
+      name
+      code
+      emoji
+    }
+  }
+`;
 
 function App() {
+  const {data, loading, error} = useQuery(LIST_COUNTRIES);
+
+  if (loading || error) {
+    return <p>{error ? error.message : 'Loading...'}</p>;
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ol>
+      {data.countries.map((country: Country) => (
+        <li key={country.code}>
+          {country.name} - {country.emoji}
+        </li>
+      ))}
+    </ol>
   );
 }
 
